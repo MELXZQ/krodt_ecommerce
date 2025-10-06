@@ -112,3 +112,7 @@ The application includes:
 3. Make your changes
 4. Run linting: `npm run lint`
 5. Submit a pull request
+
+## License
+
+This project is open source and available under the MIT License.
