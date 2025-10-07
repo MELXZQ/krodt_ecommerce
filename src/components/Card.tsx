@@ -33,15 +33,15 @@ export default function Card({
 }: CardProps) {
   const badgeBg =
     badge?.color === "red"
-      ? "bg-[var(--color-red)]/10 text-[var(--color-red)]"
+      ? "text-[var(--color-red)]"
       : badge?.color === "green"
-      ? "bg-[var(--color-green)]/10 text-[var(--color-green)]"
-      : "bg-[var(--color-orange)]/10 text-[var(--color-orange)]";
+      ? "text-[var(--color-green)]"
+      : "text-[var(--color-orange)]";
 
   return (
     <article
       className={cx(
-        "group relative flex flex-col overflow-hidden rounded-xl border border-[var(--color-light-300)] bg-[var(--color-light-100)] shadow-sm",
+        "group relative flex flex-col overflow-hidden rounded-xl border border-[var(--color-light-300)] bg-transparent shadow-sm",
         className
       )}
     >
@@ -56,37 +56,28 @@ export default function Card({
         />
         {badge && (
           <span
-            className={`absolute left-3 top-3 rounded-full px-3 py-1 text-[12px] font-medium ${badgeBg}`}
+            className={`absolute left-3 top-3 rounded-full bg-white px-3 py-[6px] text-[12px] font-medium shadow-sm ${badgeBg}`}
           >
             {badge.label}
           </span>
         )}
       </div>
 
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <h3 className="text-[var(--color-dark-900)] text-base font-medium">
-          {title}
-        </h3>
+      <div className="flex flex-1 flex-col gap-1 bg-[var(--color-dark-900)] px-4 py-3 text-[var(--color-light-100)]">
+        <div className="flex items-center justify-between">
+          <h3 className="truncate text-[15px] font-medium">{title}</h3>
+          <span className="text-[13px] text-[var(--color-light-400)]">
+            {typeof price === "number" ? `$${price}` : price}
+          </span>
+        </div>
+        {brand && (
+          <p className="text-[13px] text-[var(--color-light-400)]">{brand}</p>
+        )}
         {description && (
-          <p className="line-clamp-2 text-[var(--color-dark-700)] text-sm">
+          <p className="line-clamp-2 text-[12px] text-[var(--color-light-500)]">
             {description}
           </p>
         )}
-        <div className="mt-auto flex items-center justify-between">
-          <span className="text-[var(--color-dark-900)] text-lg font-semibold">
-            {typeof price === "number" ? `$${price}` : price}
-          </span>
-          {brand && (
-            <span className="text-[var(--color-dark-500)] text-sm">{brand}</span>
-          )}
-        </div>
-        <a
-          href={href}
-          className="mt-3 inline-flex items-center justify-center rounded-md bg-black px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-800"
-          aria-label={`View ${title}`}
-        >
-          View
-        </a>
       </div>
     </article>
   );
