@@ -29,7 +29,7 @@ export default function Navbar() {
             alt="Logo"
             width={32}
             height={32}
-            className="h-8 w-8"
+            className="h-8 w-8 invert"
           />
         </Link>
 

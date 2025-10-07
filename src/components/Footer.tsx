@@ -32,11 +32,11 @@ export default function Footer() {
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-12 md:grid-cols-12 md:px-6 md:py-16">
         <div className="md:col-span-2">
           <Image
-            src="/logo-inverse.svg"
+            src="/logo.svg"
             alt="Logo"
             width={40}
             height={40}
-            className="h-10 w-10"
+            className="h-15 w-15"
           />
         </div>
 
