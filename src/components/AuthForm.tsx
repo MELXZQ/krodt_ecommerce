@@ -3,14 +3,34 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import SocialProviders from "./SocialProviders";
+import {useRouter} from "next/navigation";
+import {signIn} from "@/lib/auth/actions";
 
 type Props = {
   mode: "sign-in" | "sign-up";
+  onSubmit: (formData: FormData) => Promise<{ok: boolean, userID? : string} | null>;
 };
 
-export default function AuthForm({ mode }: Props) {
+export default function AuthForm({ mode, onSubmit}: Props) {
   const [showPassword, setShowPassword] = useState(false);
   const isSignup = mode === "sign-up";
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      const formData = new FormData(e.currentTarget);
+
+      try {
+          const result = await onSubmit(formData);
+
+          if (result?.ok) router.push("/");
+
+      } catch (e) {
+          console.error(e);
+      }
+
+  }
 
   return (
     <div className="w-full">
@@ -51,7 +71,7 @@ export default function AuthForm({ mode }: Props) {
       </div>
 
       <form
-        onSubmit={(e) => e.preventDefault()}
+        onSubmit={handleSubmit}
         className="space-y-4"
         noValidate
         aria-describedby="auth-footnote"

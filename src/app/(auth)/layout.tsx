@@ -6,7 +6,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
       <aside className="bg-[var(--color-dark-900)] text-[var(--color-light-100)] flex flex-col justify-between rounded-b-[24px] md:rounded-none p-6 md:p-10">
         <div className="flex items-center">
-          <Image src="/logo.svg" alt="Logo" width={36} height={36} className="invert" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-md bg-orange-500">
+            <Image src="/logo.svg" alt="Logo" width={24} height={24} />
+          </div>
         </div>
         <div className="max-w-md">
           <h1 className="text-3xl md:text-[var(--text-heading-3)] font-medium mb-3">Just Do It</h1>
