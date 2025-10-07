@@ -1,31 +1,70 @@
-import React from 'react'
-import Card from "../components/Card";
+import React from "react";
+import Card from "@/components/Card";
 
+const products = [
+  {
+    id: 1,
+    title: "Air Max Pulse",
+    subtitle: "Men's Shoes",
+    meta: "6 Colour",
+    price: 149.99,
+    imageSrc: "/shoes/shoe-1.jpg",
+    badge: { label: "New", tone: "orange" as const },
+  },
+  {
+    id: 2,
+    title: "Air Zoom Pegasus",
+    subtitle: "Men's Shoes",
+    meta: "4 Colour",
+    price: 129.99,
+    imageSrc: "/shoes/shoe-2.webp",
+    badge: { label: "Hot", tone: "red" as const },
+  },
+  {
+    id: 3,
+    title: "InfinityRN 4",
+    subtitle: "Men's Shoes",
+    meta: "6 Colour",
+    price: 159.99,
+    imageSrc: "/shoes/shoe-3.webp",
+    badge: { label: "Trending", tone: "green" as const },
+  },
+  {
+    id: 4,
+    title: "Metcon 9",
+    subtitle: "Men's Shoes",
+    meta: "3 Colour",
+    price: 139.99,
+    imageSrc: "/shoes/shoe-4.webp",
+  },
+];
 
 const Home = () => {
-    return (
-        <main className="mx-auto max-w-7xl px-4 md:px-6 py-8">
-            <h1 className="text-heading-1 font-jost mb-6">Nike</h1>
+  return (
+    <main className="mx-auto max-w-7xl px-4 md:px-6 py-8">
+      <section aria-labelledby="latest" className="pb-12">
+        <h2 id="latest" className="mb-6 text-heading-3 text-dark-900">
+          Latest shoes
+        </h2>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {products.map((p) => (
+            <Card
+              key={p.id}
+              title={p.title}
+              imageSrc={p.imageSrc}
+              price={p.price}
+              brand={p.subtitle}
+              badge={
+                p.badge
+                  ? { label: p.badge.label, color: p.badge.tone as "red" | "green" | "orange" }
+                  : undefined
+              }
+            />
+          ))}
+        </div>
+      </section>
+    </main>
+  );
+};
 
-            {/* Product Grid Demo */} 
-            {/* Replace imageSrc with real product images in /public when available */}
-            <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {[
-                    { title: "Nike Air Force 1 Mid '07", imageSrc: "/vercel.svg", price: "$98.30", brand: "Men's Shoes", badge: { label: "Best Seller", color: "red" as const } },
-                    { title: "Nike Court Vision Low Next Nature", imageSrc: "/vercel.svg", price: "$98.30", brand: "Men's Shoes", badge: { label: "Extra 20% off", color: "green" as const } },
-                    { title: "Nike Dunk Low Retro", imageSrc: "/vercel.svg", price: "$98.30", brand: "Men's Shoes", badge: { label: "Extra 10% off", color: "green" as const } },
-                ].map((p) => (
-                    <Card
-                        key={p.title}
-                        title={p.title}
-                        imageSrc={p.imageSrc}
-                        price={p.price}
-                        brand={p.brand}
-                        badge={p.badge}
-                    />
-                ))}
-            </section>
-        </main>
-    )
-}
-export default Home
+export default Home;
