@@ -29,14 +29,14 @@ const columns = [
 export default function Footer() {
   return (
     <footer className="w-full bg-[var(--color-dark-900)] text-[var(--color-light-100)]">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 py-10 md:grid-cols-12 md:px-6 md:py-14">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-12 md:grid-cols-12 md:px-6 md:py-16">
         <div className="md:col-span-2">
           <Image
             src="/logo-inverse.svg"
             alt="Logo"
-            width={36}
-            height={36}
-            className="h-9 w-9"
+            width={40}
+            height={40}
+            className="h-10 w-10"
           />
         </div>
 
@@ -51,7 +51,7 @@ export default function Footer() {
                   <li key={l}>
                     <Link
                       href="#"
-                      className="text-[var(--color-light-400)] hover:text-[var(--color-light-200)] text-sm"
+                      className="text-[var(--color-light-500)] hover:text-[var(--color-light-200)] text-sm"
                     >
                       {l}
                     </Link>
@@ -82,24 +82,29 @@ export default function Footer() {
 
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-6 md:flex-row md:px-6">
-          <p className="text-[var(--color-light-400)] text-xs">
-            © {new Date().getFullYear()} KroDT. All rights reserved.
+          <p className="text-[var(--color-light-500)] text-xs">
+            © {new Date().getFullYear()} Nike, Inc. All Rights Reserved
           </p>
           <nav aria-label="Footer links">
-            <ul className="flex items-center gap-6 text-xs text-[var(--color-light-400)]">
+            <ul className="flex items-center gap-6 text-xs text-[var(--color-light-500)]">
               <li>
                 <Link href="#" className="hover:text-[var(--color-light-200)]">
-                  Privacy
+                  Guides
                 </Link>
               </li>
               <li>
                 <Link href="#" className="hover:text-[var(--color-light-200)]">
-                  Terms
+                  Terms of Sale
                 </Link>
               </li>
               <li>
                 <Link href="#" className="hover:text-[var(--color-light-200)]">
-                  Contact
+                  Terms of Use
+                </Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-[var(--color-light-200)]">
+                  Nike Privacy Policy
                 </Link>
               </li>
             </ul>

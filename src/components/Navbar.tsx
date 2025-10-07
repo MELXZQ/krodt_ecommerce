@@ -27,9 +27,9 @@ export default function Navbar() {
           <Image
             src="/logo.svg"
             alt="Logo"
-            width={28}
-            height={28}
-            className="h-7 w-7"
+            width={32}
+            height={32}
+            className="h-8 w-8"
           />
         </Link>
 
@@ -52,7 +52,7 @@ export default function Navbar() {
           </svg>
         </button>
 
-        <ul className="hidden items-center gap-8 md:flex">
+        <ul className="hidden items-center gap-10 md:flex">
           {navItems.map((item) => (
             <li key={item.label}>
               <Link
