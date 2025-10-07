@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Jost } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const jost = Jost({
   variable: "--font-jost",
@@ -12,14 +14,16 @@ export const metadata: Metadata = {
   description: "An e-commerce platform for Nike shoes by KroDT",
 };
 
-export default function RootShell({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${jost.className} antialiased`}>{children}</body>
-    </html>
+    <div className={`${jost.className} antialiased`}>
+      <Navbar />
+      {children}
+      <Footer />
+    </div>
   );
 }
