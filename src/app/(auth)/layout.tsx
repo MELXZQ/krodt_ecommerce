@@ -24,12 +24,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
       <main className="bg-[var(--color-light-100)] flex items-center justify-center py-10">
         <div className="w-full max-w-md px-6 relative">
-          <div className="absolute right-6 -top-3 hidden md:block text-sm text-[var(--color-dark-700)]">
-            <span>Already have an account? </span>
-            <Link href="/sign-in" className="underline hover:opacity-80">
-              Sign In
-            </Link>
-          </div>
           {children}
         </div>
       </main>
