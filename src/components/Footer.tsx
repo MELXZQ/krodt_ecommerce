@@ -72,7 +72,7 @@ export default function Footer() {
               key={i.label}
               href="#"
               aria-label={i.label}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-light-400)] text-[var(--color-light-100)]"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-white"
             >
               <Image src={i.src} alt={i.label} width={16} height={16} />
             </Link>
