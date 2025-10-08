@@ -1,8 +1,18 @@
-import { Product } from '@/lib/db/schema';
 import Image from 'next/image';
 
 interface ProductCardProps {
-  product: Product;
+  product: {
+    id: string;
+    name: string;
+    description?: string | null;
+    price: number;
+    imageUrl: string;
+    brand?: string | null;
+    category?: string | null;
+    size?: string | number | null;
+    color?: string | null;
+    stock?: number | null;
+  };
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
