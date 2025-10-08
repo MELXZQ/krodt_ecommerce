@@ -3,7 +3,7 @@ import Card from "@/components/Card";
 import { getAllProducts } from "@/lib/actions/product";
 
 const Home = async () => {
-  const { products } = await getAllProducts({ limit: 6, sort: "newest" });
+  const { products } = await getAllProducts({ limit: 6 });
 
   return (
     <main className="mx-auto max-w-7xl px-4 md:px-6 py-8">

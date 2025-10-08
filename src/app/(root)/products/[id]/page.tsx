@@ -139,7 +139,7 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
         src,
         alt: `${product.name} - ${v.color?.name ?? "image"} ${i + 1}`,
       }));
-      const swatchUrl = imgs.length > 0 ? imgs[0].src : undefined;
+      const swatchUrl = imgs.length > 0 ? imgs[0].src : "";
       return {
         id: v.id,
         name: v.color?.name ?? v.sku,
