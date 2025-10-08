@@ -39,7 +39,8 @@ export default function Card({
       : "text-[var(--color-orange)]";
 
   return (
-    <article
+    <a
+      href={href}
       className={cx(
         "group relative flex flex-col overflow-hidden rounded-xl border border-[var(--color-light-300)] bg-transparent shadow-sm",
         className
@@ -79,6 +80,6 @@ export default function Card({
           </p>
         )}
       </div>
-    </article>
+    </a>
   );
 }

@@ -66,6 +66,7 @@ export default async function ProductsPage(props: { searchParams: SearchParams }
                   imageSrc={p.imageUrl || '/placeholder-image.jpg'}
                   price={p.minPrice === p.maxPrice ? p.minPrice : `$${p.minPrice} - $${p.maxPrice}`}
                   brand={p.brand ?? undefined}
+                  href={`/products/${p.id}`}
                 />
               ))}
             </div>
