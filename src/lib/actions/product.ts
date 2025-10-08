@@ -10,6 +10,7 @@ import {
   genders,
   colors,
   sizes,
+  reviews,
 } from '@/lib/db/schema';
 import {
   and,
@@ -199,8 +200,24 @@ export async function getAllProducts(params: ProductListParams): Promise<GetAllP
     createdAt: r.createdAt ?? null,
   }));
 
+
   return { products: result, totalCount: Number(total ?? 0) };
 }
+export type Review = {
+  id: string;
+  author: string;
+  rating: number;
+  content: string;
+  createdAt: string;
+};
+
+export type RecommendedCard = {
+  id: string;
+  title: string;
+  price: number;
+  imageUrl: string;
+};
+
 
 export type ProductDetail = {
   id: string;
@@ -312,4 +329,104 @@ export async function getProduct(productId: string): Promise<ProductDetail | nul
     variants: Array.from(variantMap.values()),
     images: genericImagesRows.map((i) => i.url),
   };
+}
+export async function getProductReviews(productId: string): Promise<Review[]> {
+  const rows = await db
+    .select({
+      id: reviews.id,
+      rating: reviews.rating,
+      comment: reviews.comment,
+      createdAt: reviews.createdAt,
+    })
+    .from(reviews)
+    .where(eq(reviews.productId, productId))
+    .orderBy(desc(reviews.createdAt))
+    .limit(50);
+
+  return rows.map((r) => ({
+    id: r.id,
+    author: 'Anonymous',
+    rating: Number(r.rating ?? 0),
+    content: r.comment ?? '',
+    createdAt: (r.createdAt ?? new Date()).toISOString(),
+  }));
+}
+
+export async function getRecommendedProducts(productId: string): Promise<RecommendedCard[]> {
+  const [base] = await db
+    .select({
+      id: products.id,
+      categoryId: products.categoryId,
+      brandId: products.brandId,
+      genderId: products.genderId,
+    })
+    .from(products)
+    .where(eq(products.id, productId))
+    .limit(1);
+
+  if (!base) return [];
+
+  const recs = await db
+    .select({
+      id: products.id,
+      title: products.name,
+      minPrice: sql<number>`min(${productVariants.price})`,
+      primaryImage: sql<string | null>`
+        (select pi.url from ${productImages} pi
+         where pi.product_id = ${products.id}
+         order by pi.is_primary desc, pi.sort_order asc
+         limit 1)`,
+      createdAt: products.createdAt,
+    })
+    .from(products)
+    .leftJoin(productVariants, eq(productVariants.productId, products.id))
+    .where(
+      and(
+        eq(products.isPublished, true),
+        eq(products.categoryId, base.categoryId),
+        eq(products.brandId, base.brandId),
+        eq(products.genderId, base.genderId),
+        sql`${products.id} <> ${productId}`,
+      ),
+    )
+    .groupBy(products.id, products.createdAt)
+    .orderBy(desc(products.createdAt))
+    .limit(6);
+
+  let finalRecs = recs;
+
+  if (!finalRecs.length) {
+    const fallback = await db
+      .select({
+        id: products.id,
+        title: products.name,
+        minPrice: sql<number>`min(${productVariants.price})`,
+        primaryImage: sql<string | null>`
+          (select pi.url from ${productImages} pi
+           where pi.product_id = ${products.id}
+           order by pi.is_primary desc, pi.sort_order asc
+           limit 1)`,
+        createdAt: products.createdAt,
+      })
+      .from(products)
+      .leftJoin(productVariants, eq(productVariants.productId, products.id))
+      .where(
+        and(
+          eq(products.isPublished, true),
+          eq(products.categoryId, base.categoryId),
+          sql`${products.id} <> ${productId}`,
+        ),
+      )
+      .groupBy(products.id, products.createdAt)
+      .orderBy(desc(products.createdAt))
+      .limit(6);
+    finalRecs = fallback;
+  }
+
+  return finalRecs.map((r) => ({
+    id: r.id,
+    title: r.title,
+    price: Number(r.minPrice ?? 0),
+    imageUrl: r.primaryImage ?? '',
+  }));
 }

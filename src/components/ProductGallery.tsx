@@ -2,7 +2,7 @@
 import React from "react";
 
 import Image from "next/image";
-import { ImageOff, ChevronLeft, ChevronRight, Check } from "lucide-react";
+import { ImageOff, ChevronLeft, ChevronRight, Check, Star } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 type ProductImage = { src: string; alt: string };
@@ -10,6 +10,8 @@ type Variant = { id: string; name: string; color: string; images: ProductImage[]
 
 interface Props {
   variants: Variant[];
+  selectedVariantIdx?: number;
+  onChangeVariantIdx?: (idx: number) => void;
 }
 
 const isValidSrc = (src: string | undefined | null) => Boolean(src && typeof src === "string");
@@ -27,11 +29,11 @@ export default function ProductGallery({ variants }: Props) {
   const images = validVariants[variantIdx]?.images ?? [];
   const [imgIdx, setImgIdx] = useState(0);
   const thumbRefs = useRef<Array<HTMLButtonElement | null>>([]);
-
+  
   useEffect(() => {
     setImgIdx(0);
   }, [variantIdx]);
-
+  
   const next = () => setImgIdx((i) => (i + 1) % Math.max(images.length, 1));
   const prev = () => setImgIdx((i) => (i - 1 + Math.max(images.length, 1)) % Math.max(images.length, 1));
 
@@ -77,7 +79,7 @@ export default function ProductGallery({ variants }: Props) {
       </div>
 
       <div
-        className="relative rounded-xl border border-light-300 bg-light-200"
+        className="relative aspect-square rounded-xl border border-light-300 bg-light-200"
         tabIndex={0}
         onKeyDown={handleKey}
         aria-live="polite"
@@ -96,6 +98,13 @@ export default function ProductGallery({ variants }: Props) {
             <ImageOff className="h-10 w-10 text-light-400" aria-hidden="true" />
           </div>
         )}
+        <div className="absolute left-4 top-4 z-10">
+          <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-sm font-medium text-dark-900 shadow">
+            <Star className="h-4 w-4" aria-hidden="true" />
+            Highly Rated
+          </span>
+        </div>
+
 
         <div className="pointer-events-none absolute inset-0 flex items-center justify-between p-3">
           <button
@@ -126,8 +135,17 @@ export default function ProductGallery({ variants }: Props) {
                 className={`relative h-8 w-8 overflow-hidden rounded-full border ${
                   i === variantIdx ? "border-dark-900" : "border-light-300"
                 } focus:outline-none focus:ring-2 focus:ring-dark-900`}
+                aria-pressed={i === variantIdx}
               >
-                <Image src={v.swatch} alt={v.name} fill sizes="32px" className="object-cover" />
+                {isValidSrc(v.swatch) ? (
+                  <Image src={v.swatch} alt={v.name} fill sizes="32px" className="object-cover" />
+                ) : (
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-0"
+                    style={{ backgroundColor: v.color || "#eeeeee" }}
+                  />
+                )}
                 {i === variantIdx && (
                   <span className="absolute inset-0 flex items-center justify-center">
                     <Check className="h-4 w-4 text-white drop-shadow" />
