@@ -87,7 +87,6 @@ async function ReviewsSection({ productId }: { productId: string }) {
                 ))}
               </div>
             </div>
-            {r.title && <p className="mt-1 font-medium">{r.title}</p>}
             <CollapsibleSection title="Read more">
               <p className="text-sm text-dark-700 whitespace-pre-line">{r.content}</p>
             </CollapsibleSection>
@@ -217,7 +216,6 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
             </CollapsibleSection>
 
             <Suspense fallback={<ReviewsSkeleton />}>
-              {/* @ts-expect-error Async Server Component */}
               <ReviewsSection productId={product.id} />
             </Suspense>
           </div>
@@ -225,7 +223,6 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
       </section>
 
       <Suspense fallback={<AlsoLikeSkeleton />}>
-        {/* @ts-expect-error Async Server Component */}
         <AlsoLikeSection productId={product.id} />
       </Suspense>
     </main>
