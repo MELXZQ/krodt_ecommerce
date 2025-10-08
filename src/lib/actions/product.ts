@@ -67,6 +67,8 @@ export async function getAllProducts(params: ParsedFilters): Promise<GetAllProdu
     .leftJoin(brands, eq(products.brandId, brands.id))
     .leftJoin(categories, eq(products.categoryId, categories.id))
     .leftJoin(genders, eq(products.genderId, genders.id))
+    .leftJoin(sizes, eq(productVariants.sizeId, sizes.id))
+    .leftJoin(colors, eq(productVariants.colorId, colors.id))
     .leftJoin(topImage, eq(topImage.productId, products.id))
     .where(where)
     .groupBy(
@@ -89,6 +91,8 @@ export async function getAllProducts(params: ParsedFilters): Promise<GetAllProdu
     .leftJoin(brands, eq(products.brandId, brands.id))
     .leftJoin(categories, eq(products.categoryId, categories.id))
     .leftJoin(genders, eq(products.genderId, genders.id))
+    .leftJoin(sizes, eq(productVariants.sizeId, sizes.id))
+    .leftJoin(colors, eq(productVariants.colorId, colors.id))
     .where(where);
 
   return { products: rows.map(r => ({ ...r, minPrice: Number(r.minPrice), maxPrice: Number(r.maxPrice) })), totalCount: Number(count) };
