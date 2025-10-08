@@ -20,19 +20,22 @@ function slugify(s: string) {
 }
 
 async function upsert<T extends { id: string }>(
-  table: any,
-  rows: Omit<T, 'id'> & Partial<T>[],
+  table: unknown,
+  rows: (Omit<T, 'id'> & Partial<T>)[],
   uniqueKey: keyof T
 ) {
-  for (const row of rows as any[]) {
-    const key = row[uniqueKey as string];
+  const t = table as Record<string, unknown>;
+  for (const row of rows) {
+    const key = row[uniqueKey];
     if (!key) {
-      await db.insert(table).values(row);
+      await (db as any).insert(t).values(row);
       continue;
     }
-    const found = await db.select().from(table).where(eq((table as any)[uniqueKey as string], key as any)).limit(1);
+    const col = t[uniqueKey as string] as unknown;
+    const q = (db as any).select().from(t).where(eq(col as any, key as any)).limit(1);
+    const found = await q;
     if (found.length === 0) {
-      await db.insert(table).values(row);
+      await (db as any).insert(t).values(row);
     }
   }
 }
@@ -65,7 +68,7 @@ async function seed() {
       { id: crypto.randomUUID(), label: 'Women', slug: 'women' },
       { id: crypto.randomUUID(), label: 'Kids', slug: 'kids' },
     ];
-    await upsert(genders as any, genderData, 'slug' as any);
+    await upsert(genders as unknown, genderData, 'slug');
 
     const colorData = [
       { id: crypto.randomUUID(), name: 'Red', slug: 'red', hexCode: '#FF0000' },
@@ -75,7 +78,7 @@ async function seed() {
       { id: crypto.randomUUID(), name: 'Green', slug: 'green', hexCode: '#10B981' },
       { id: crypto.randomUUID(), name: 'Grey', slug: 'grey', hexCode: '#6B7280' },
     ];
-    await upsert(colors as any, colorData, 'slug' as any);
+    await upsert(colors as unknown, colorData, 'slug');
 
     const sizeData = [
       { id: crypto.randomUUID(), name: '7', slug: '7', sortOrder: 1 },
@@ -85,18 +88,18 @@ async function seed() {
       { id: crypto.randomUUID(), name: '11', slug: '11', sortOrder: 5 },
       { id: crypto.randomUUID(), name: '12', slug: '12', sortOrder: 6 },
     ];
-    await upsert(sizes as any, sizeData, 'slug' as any);
+    await upsert(sizes as unknown, sizeData, 'slug');
 
     const nikeBrand = { id: crypto.randomUUID(), name: 'Nike', slug: 'nike', logoUrl: undefined as unknown as string | undefined };
-    await upsert(brands as any, [nikeBrand], 'slug' as any);
+    await upsert(brands as unknown, [nikeBrand], 'slug');
 
     const categoryNames = ['Running', 'Basketball', 'Lifestyle', 'Training', 'Soccer'];
     const categoryData = categoryNames.map((n) => ({ id: crypto.randomUUID(), name: n, slug: slugify(n), parentId: null as any }));
-    await upsert(categories as any, categoryData, 'slug' as any);
+    await upsert(categories as unknown, categoryData, 'slug');
 
     const collectionNames = ["Summer '25", "Fall '25", "Essentials"];
     const collectionsData = collectionNames.map((n) => ({ id: crypto.randomUUID(), name: n, slug: slugify(n), createdAt: new Date() }));
-    await upsert(collections as any, collectionsData, 'slug' as any);
+    await upsert(collections as unknown, collectionsData, 'slug');
 
     console.log('Copying images if available...');
     const copiedImages = await ensureStaticUploads();
@@ -163,8 +166,8 @@ async function seed() {
             id: vid,
             productId: pid,
             sku: `${slugify(productNames[i])}-${col.slug}-${sz.slug}-${skuCounter}`,
-            price: price as unknown as any,
-            salePrice: sale as unknown as any,
+            price: price,
+            salePrice: sale ?? undefined,
             colorId: col.id,
             sizeId: sz.id,
             inStock: 10 + ((i + skuCounter) % 10),
