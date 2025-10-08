@@ -1,7 +1,4 @@
-"use server";
-
 import Link from "next/link";
-import Image from "next/image";
 import { Heart, ShoppingBag, Star } from "lucide-react";
 import ProductGallery from "@/components/ProductGallery";
 import SizePicker from "@/components/SizePicker";
