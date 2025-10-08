@@ -58,6 +58,7 @@ const Home = async () => {
                             imageSrc={p.imageSrc}
                             price={p.price}
                             brand={p.subtitle}
+                            href={`/products/${p.id}`}
                             badge={
                                 p.badge
                                     ? { label: p.badge.label, color: p.badge.tone as "red" | "green" | "orange" }
