@@ -5,7 +5,7 @@ import { products } from './products';
 export const collections = pgTable('collections', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 128 }).notNull(),
-  slug: varchar('slug', { length: 128 }).notNull(),
+  slug: varchar('slug', { length: 128 }).notNull().unique(),
   createdAt: timestamp('created_at').defaultNow(),
 });
 

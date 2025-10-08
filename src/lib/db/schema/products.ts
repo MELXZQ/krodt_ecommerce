@@ -13,7 +13,7 @@ export const products = pgTable('products', {
   genderId: uuid('gender_id').notNull().references(() => genders.id, { onDelete: 'restrict' }),
   brandId: uuid('brand_id').notNull().references(() => brands.id, { onDelete: 'restrict' }),
   isPublished: boolean('is_published').notNull().default(true),
-  defaultVariantId: uuid('default_variant_id').references(() => productVariants.id, { onDelete: 'set null' }),
+  defaultVariantId: uuid('default_variant_id'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });

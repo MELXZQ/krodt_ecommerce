@@ -5,7 +5,7 @@ import { products } from './products';
 export const brands = pgTable('brands', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 128 }).notNull(),
-  slug: varchar('slug', { length: 128 }).notNull(),
+  slug: varchar('slug', { length: 128 }).notNull().unique(),
   logoUrl: text('logo_url'),
 });
 

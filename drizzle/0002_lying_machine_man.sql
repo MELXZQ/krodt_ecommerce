@@ -1,0 +1,1 @@
+ALTER TABLE "genders" ADD CONSTRAINT "genders_slug_unique" UNIQUE("slug");
