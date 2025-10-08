@@ -1,75 +1,32 @@
 import React from "react";
 import Card from "@/components/Card";
-import {getCurrentUser} from "@/lib/auth/actions";
-
-const products = [
-    {
-        id: 1,
-        title: "Air Max Pulse",
-        subtitle: "Men's Shoes",
-        meta: "6 Colour",
-        price: 149.99,
-        imageSrc: "/shoes/shoe-1.jpg",
-        badge: { label: "New", tone: "orange" as const },
-    },
-    {
-        id: 2,
-        title: "Air Zoom Pegasus",
-        subtitle: "Men's Shoes",
-        meta: "4 Colour",
-        price: 129.99,
-        imageSrc: "/shoes/shoe-2.webp",
-        badge: { label: "Hot", tone: "red" as const },
-    },
-    {
-        id: 3,
-        title: "InfinityRN 4",
-        subtitle: "Men's Shoes",
-        meta: "6 Colour",
-        price: 159.99,
-        imageSrc: "/shoes/shoe-3.webp",
-        badge: { label: "Trending", tone: "green" as const },
-    },
-    {
-        id: 4,
-        title: "Metcon 9",
-        subtitle: "Men's Shoes",
-        meta: "3 Colour",
-        price: 139.99,
-        imageSrc: "/shoes/shoe-4.webp",
-    },
-];
+import { getAllProducts } from "@/lib/actions/product";
 
 const Home = async () => {
-    const user = await getCurrentUser();
-    console.log('user', user);
+  const { products } = await getAllProducts({ limit: 6, sort: "newest" });
 
-    return (
-        <main className="mx-auto max-w-7xl px-4 md:px-6 py-8">
-            <section aria-labelledby="latest" className="pb-12">
-                <h2 id="latest" className="mb-6 text-heading-3 text-dark-900">
-                    Latest shoes
-                </h2>
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {products.map((p) => (
-                        <Card
-                            key={p.id}
-                            title={p.title}
-                            imageSrc={p.imageSrc}
-                            price={p.price}
-                            brand={p.subtitle}
-                            href={`/products/${p.id}`}
-                            badge={
-                                p.badge
-                                    ? { label: p.badge.label, color: p.badge.tone as "red" | "green" | "orange" }
-                                    : undefined
-                            }
-                        />
-                    ))}
-                </div>
-            </section>
-        </main>
-    );
+  return (
+    <main className="mx-auto max-w-7xl px-4 md:px-6 py-8">
+      <section aria-labelledby="latest" className="pb-12">
+        <h2 id="latest" className="mb-6 text-heading-3 text-dark-900">
+          Latest shoes
+        </h2>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {products.map((p) => (
+            <Card
+              key={p.id}
+              title={p.name}
+              description={p.description ?? undefined}
+              imageSrc={p.imageUrl || "/placeholder-image.jpg"}
+              price={p.minPrice === p.maxPrice ? p.minPrice : `$${p.minPrice} - $${p.maxPrice}`}
+              brand={p.brand ?? undefined}
+              href={`/products/${p.id}`}
+            />
+          ))}
+        </div>
+      </section>
+    </main>
+  );
 };
 
 export default Home;
