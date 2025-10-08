@@ -79,7 +79,7 @@ export default function ProductGallery({ variants }: Props) {
       </div>
 
       <div
-        className="relative rounded-xl border border-light-300 bg-light-200"
+        className="relative aspect-square rounded-xl border border-light-300 bg-light-200"
         tabIndex={0}
         onKeyDown={handleKey}
         aria-live="polite"

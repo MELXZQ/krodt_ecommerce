@@ -18,8 +18,10 @@ export default function SizePicker({ sizes }: Props) {
             key={s}
             type="button"
             onClick={() => setSelected(s)}
-            className={`rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-dark-900 ${
-              active ? "border-dark-900" : "border-light-300"
+            className={`h-11 w-14 rounded-md border text-sm focus:outline-none focus:ring-2 focus:ring-dark-900 ${
+              active
+                ? "bg-[var(--color-dark-900)] text-white border-[var(--color-dark-900)]"
+                : "bg-white text-dark-900 border-light-300 hover:border-dark-900"
             }`}
             aria-pressed={active}
           >

@@ -177,7 +177,7 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
             <p className="text-[var(--color-dark-700)] text-sm">{subtitleParts.join(" • ")}</p>
           </header>
 
-          <div className="mb-5 flex items-end gap-3">
+          <div className="mb-2 flex items-end gap-3">
             <p className="text-2xl font-semibold text-dark-900">
               {priceDisplay(
                 isFinite(minPrice) ? minPrice : undefined,
@@ -185,6 +185,7 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
               )}
             </p>
           </div>
+          <p className="mb-4 text-sm font-medium text-green-600">Extra 20% off w/ code SPORT</p>
           <div className="mb-4 hidden md:block">
             <div className="flex items-center gap-3">
               {galleryVariants.slice(0, 6).map((v, i) => {
@@ -239,6 +240,10 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
             <CollapsibleSection title="Product Details" defaultOpen>
               <p className="text-[15px] text-dark-700 mb-4">{product.description}</p>
             </CollapsibleSection>
+            <CollapsibleSection title="Shipping &amp; Returns">
+              <p className="text-[15px] text-dark-700">Free standard shipping and 30-day returns on eligible orders.</p>
+            </CollapsibleSection>
+
 
             <Suspense fallback={<ReviewsSkeleton />}>
               <ReviewsSection productId={product.id} />
