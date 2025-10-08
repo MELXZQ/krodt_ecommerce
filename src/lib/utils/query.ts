@@ -79,3 +79,57 @@ export function getSortComparator(sort: SortKey) {
       return () => 0;
   }
 }
+export type FilterParams = {
+  search?: string;
+  brand?: string[];
+  category?: string[];
+  gender?: string[];
+  color?: string[];
+  size?: string[];
+  priceMin?: number;
+  priceMax?: number;
+  sortBy?: 'price_asc' | 'price_desc' | 'latest' | 'featured';
+  page?: number;
+  limit?: number;
+};
+
+export function parseFilterParams(raw: URLSearchParams | Record<string, string | string[] | undefined>): FilterParams {
+  const toArr = (v: unknown) => {
+    if (!v) return [];
+    if (Array.isArray(v)) return v.map(String);
+    return String(v).split(',').filter(Boolean);
+  };
+  const get = (k: string) =>
+    raw instanceof URLSearchParams ? raw.get(k) : (raw as Record<string, string | string[] | undefined>)[k];
+
+  const brand = toArr(get('brand') as unknown);
+  const category = toArr(get('category') as unknown);
+  const gender = toArr(get('gender') as unknown);
+  const color = toArr(get('color') as unknown);
+  const size = toArr(get('size') as unknown);
+  const search = (get('search') as string) || undefined;
+  const sortBy = ((get('sortBy') as string) || 'latest') as FilterParams['sortBy'];
+  const page = Number(get('page') ?? 1) || 1;
+  const limit = Number(get('limit') ?? 24) || 24;
+
+  const priceMin = get('priceMin') ? Number(get('priceMin')) : undefined;
+  const priceMax = get('priceMax') ? Number(get('priceMax')) : undefined;
+
+  return {
+    search,
+    brand: brand.length ? brand : undefined,
+    category: category.length ? category : undefined,
+    gender: gender.length ? gender : undefined,
+    color: color.length ? color : undefined,
+    size: size.length ? size : undefined,
+    priceMin,
+    priceMax,
+    sortBy,
+    page,
+    limit,
+  };
+}
+
+export function buildProductQueryObject(fp: FilterParams) {
+  return fp;
+}
