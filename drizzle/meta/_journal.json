@@ -8,6 +8,34 @@
       "when": 1759852393401,
       "tag": "0000_parallel_raider",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1759925656411,
+      "tag": "0001_eager_pandemic",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1759928319148,
+      "tag": "0002_lying_machine_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1759929402699,
+      "tag": "0003_futuristic_argent",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1759929802198,
+      "tag": "0004_superb_pepper_potts",
+      "breakpoints": true
     }
   ]
 }
