@@ -127,7 +127,15 @@ export default function ProductGallery({ variants }: Props) {
                   i === variantIdx ? "border-dark-900" : "border-light-300"
                 } focus:outline-none focus:ring-2 focus:ring-dark-900`}
               >
-                <Image src={v.swatch} alt={v.name} fill sizes="32px" className="object-cover" />
+                {isValidSrc(v.swatch) ? (
+                  <Image src={v.swatch} alt={v.name} fill sizes="32px" className="object-cover" />
+                ) : (
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-0"
+                    style={{ backgroundColor: v.color || "#eeeeee" }}
+                  />
+                )}
                 {i === variantIdx && (
                   <span className="absolute inset-0 flex items-center justify-center">
                     <Check className="h-4 w-4 text-white drop-shadow" />

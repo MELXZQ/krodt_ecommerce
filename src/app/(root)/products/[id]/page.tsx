@@ -109,7 +109,7 @@ async function AlsoLikeSection({ productId }: { productId: string }) {
             key={p.id}
             title={p.title}
             description=""
-            imageSrc={p.imageUrl}
+            imageSrc={p.imageUrl || "/placeholder-image.jpg"}
             price={p.price}
             href={`/products/${p.id}`}
           />
@@ -134,16 +134,20 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
   );
 
   const galleryVariants =
-    product.variants.map((v) => ({
-      id: v.id,
-      name: v.color?.name ?? v.sku,
-      color: v.color?.hexCode ?? "#ffffff",
-      swatch: "",
-      images: (v.images && v.images.length ? v.images : product.images).map((src, i) => ({
+    product.variants.map((v) => {
+      const imgs = (v.images && v.images.length ? v.images : product.images).map((src, i) => ({
         src,
         alt: `${product.name} - ${v.color?.name ?? "image"} ${i + 1}`,
-      })),
-    })) ?? [];
+      }));
+      const swatchUrl = imgs.length > 0 ? imgs[0].src : undefined;
+      return {
+        id: v.id,
+        name: v.color?.name ?? v.sku,
+        color: v.color?.hexCode ?? "#ffffff",
+        swatch: swatchUrl,
+        images: imgs,
+      };
+    }) ?? [];
 
   const hasAnyImages =
     galleryVariants.some((v) => v.images && v.images.length > 0) || product.images.length > 0;
