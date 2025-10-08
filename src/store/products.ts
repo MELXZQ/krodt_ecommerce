@@ -1,11 +1,18 @@
 import { create } from 'zustand';
-import { Product } from '@/lib/db/schema';
+
+type ProductLite = {
+  id: string;
+  name: string;
+  description?: string | null;
+  price: number;
+  imageUrl: string;
+};
 
 interface ProductStore {
-  products: Product[];
+  products: ProductLite[];
   loading: boolean;
   error: string | null;
-  setProducts: (products: Product[]) => void;
+  setProducts: (products: ProductLite[]) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
 }
