@@ -38,7 +38,7 @@ export async function getAllProducts(params: ParsedFilters): Promise<GetAllProdu
   const topImage = db
     .select({
       productId: productImages.productId,
-      url: sql<string>`(array_agg(${productImages.url} ORDER BY ${productImages.isPrimary} DESC, ${productImages.sortOrder} ASC))[1]`,
+      url: sql<string>`(array_agg(${productImages.url} ORDER BY ${productImages.isPrimary} DESC, ${productImages.sortOrder} ASC))[1]`.as('url'),
     })
     .from(productImages)
     .where(
