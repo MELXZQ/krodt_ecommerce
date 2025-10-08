@@ -10,9 +10,9 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { label: "Men", href: "#" },
-  { label: "Women", href: "#" },
-  { label: "Kids", href: "#" },
+  { label: "Men", href: "/products?gender=men" },
+  { label: "Women", href: "/products?gender=women" },
+  { label: "Kids", href: "/products?gender=kids" },
   { label: "Collections", href: "#" },
   { label: "Contact", href: "#" },
 ];
