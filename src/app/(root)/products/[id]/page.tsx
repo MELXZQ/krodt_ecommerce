@@ -185,6 +185,27 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
               )}
             </p>
           </div>
+          <div className="mb-4 hidden md:block">
+            <div className="flex items-center gap-3">
+              {galleryVariants.slice(0, 6).map((v, i) => {
+                const first = v.images?.[0];
+                return (
+                  <button
+                    key={v.id}
+                    className="relative h-12 w-16 overflow-hidden rounded-md border border-light-300 hover:border-dark-900"
+                    aria-label={`Select ${v.name}`}
+                  >
+                    {first ? (
+                      <img src={first.src} alt={v.name} className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="absolute inset-0" style={{ backgroundColor: v.color }} />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
 
           <div className="mb-6">
           </div>
