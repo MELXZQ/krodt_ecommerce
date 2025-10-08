@@ -19,24 +19,12 @@ function slugify(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 }
 
-
-async function ensureStaticUploads() {
-  const uploadsDir = path.join(process.cwd(), 'static', 'uploads');
-  if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-
+function getShoeImages(): string[] {
   const shoesSrc = path.join(process.cwd(), 'public', 'shoes');
-  const shoeFiles = fs.existsSync(shoesSrc) ? fs.readdirSync(shoesSrc).filter(f => /\.(png|jpg|jpeg|webp)$/i.test(f)) : [];
-
-  const copied: string[] = [];
-  for (const f of shoeFiles) {
-    const src = path.join(shoesSrc, f);
-    const dest = path.join(uploadsDir, f);
-    if (!fs.existsSync(dest)) {
-      fs.copyFileSync(src, dest);
-    }
-    copied.push(`/static/uploads/${f}`);
-  }
-  return copied;
+  const files = fs.existsSync(shoesSrc)
+    ? fs.readdirSync(shoesSrc).filter((f) => /\.(png|jpe?g|webp|avif)$/i.test(f))
+    : [];
+  return files.map((f) => `/shoes/${f}`);
 }
 
 async function seed() {
@@ -91,8 +79,8 @@ async function seed() {
       await db.insert(collections).values(col).onConflictDoNothing({ target: [collections.slug] });
     }
 
-    console.log('Copying images if available...');
-    const copiedImages = await ensureStaticUploads();
+    console.log('Reading local shoe images...');
+    const shoeImages = getShoeImages();
 
     console.log('Seeding 15 products with variants and images...');
     const gendersAll = await db.select().from(genders);
@@ -168,27 +156,19 @@ async function seed() {
 
           if (!primaryVariantId) primaryVariantId = vid;
 
-          const imgSet = copiedImages.length
-            ? copiedImages.slice(0, Math.min(3, copiedImages.length))
-            : [
-                `https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/${i}a-${skuCounter}-1.png`,
-                `https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/${i}a-${skuCounter}-2.png`,
-              ];
-
-          let sort = 0;
-          for (const url of imgSet) {
-            await db.insert(productImages).values({
-              id: crypto.randomUUID(),
-              productId: pid,
-              variantId: vid,
-              url,
-              sortOrder: sort++,
-              isPrimary: sort === 1,
-            });
-          }
           skuCounter++;
         }
       }
+
+      const uniqueImg = shoeImages[i % shoeImages.length] ?? `/shoes/shoe-${i + 1}.jpg`;
+      await db.insert(productImages).values({
+        id: crypto.randomUUID(),
+        productId: pid,
+        variantId: null,
+        url: uniqueImg,
+        sortOrder: 0,
+        isPrimary: true,
+      });
 
       if (primaryVariantId) {
         await db.update(products).set({ defaultVariantId: primaryVariantId, updatedAt: new Date() }).where(eq(products.id, pid));
