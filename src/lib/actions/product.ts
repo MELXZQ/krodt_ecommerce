@@ -393,12 +393,40 @@ export async function getRecommendedProducts(productId: string): Promise<Recomme
     .orderBy(desc(products.createdAt))
     .limit(6);
 
-  return recs
-    .filter((r) => typeof r.primaryImage === 'string' && r.primaryImage.trim().length > 0)
-    .map((r) => ({
-      id: r.id,
-      title: r.title,
-      price: Number(r.minPrice ?? 0),
-      imageUrl: r.primaryImage!,
-    }));
+  let finalRecs = recs;
+
+  if (!finalRecs.length) {
+    const fallback = await db
+      .select({
+        id: products.id,
+        title: products.name,
+        minPrice: sql<number>`min(${productVariants.price})`,
+        primaryImage: sql<string | null>`
+          (select pi.url from ${productImages} pi
+           where pi.product_id = ${products.id}
+           order by pi.is_primary desc, pi.sort_order asc
+           limit 1)`,
+        createdAt: products.createdAt,
+      })
+      .from(products)
+      .leftJoin(productVariants, eq(productVariants.productId, products.id))
+      .where(
+        and(
+          eq(products.isPublished, true),
+          eq(products.categoryId, base.categoryId),
+          sql`${products.id} <> ${productId}`,
+        ),
+      )
+      .groupBy(products.id, products.createdAt)
+      .orderBy(desc(products.createdAt))
+      .limit(6);
+    finalRecs = fallback;
+  }
+
+  return finalRecs.map((r) => ({
+    id: r.id,
+    title: r.title,
+    price: Number(r.minPrice ?? 0),
+    imageUrl: r.primaryImage ?? '',
+  }));
 }
