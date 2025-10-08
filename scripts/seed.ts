@@ -1,84 +1,220 @@
+import path from 'node:path';
+import fs from 'node:fs';
 import { db } from '../src/lib/db';
-import { products } from '../src/lib/db/schema';
+import {
+  products,
+  productVariants,
+  productImages,
+  genders,
+  sizes,
+  colors,
+  brands,
+  categories,
+  collections,
+  productCollections,
+} from '../src/lib/db/schema';
+import { eq } from 'drizzle-orm';
 
-const nikeProducts = [
-  {
-    name: 'Nike Air Max 90',
-    description: 'The Nike Air Max 90 stays true to its OG running roots with the iconic Waffle sole, stitched overlays and classic TPU details.',
-    price: '119.99',
-    imageUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/99486859-0ff3-46b4-949b-2d16af2ad421/air-max-90-mens-shoes-6n7J06.png',
-    category: 'Shoes',
-    brand: 'Nike',
-    size: '10',
-    color: 'White/Black',
-    stock: 25,
-  },
-  {
-    name: 'Nike Air Force 1',
-    description: 'The radiance lives on in the Nike Air Force 1, the basketball original that puts a fresh spin on what you know best.',
-    price: '109.99',
-    imageUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/b7d9211c-26e7-431a-ac24-b0540fb3c00f/air-force-1-07-mens-shoes-jBrhbr.png',
-    category: 'Shoes',
-    brand: 'Nike',
-    size: '9',
-    color: 'White',
-    stock: 30,
-  },
-  {
-    name: 'Nike Dunk Low',
-    description: 'Created for the hardwood but taken to the streets, the Nike Dunk Low Retro returns with crisp overlays and original team colors.',
-    price: '99.99',
-    imageUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/61077282-1d6e-4b1f-9c65-5d5c5c8b5c5c/dunk-low-mens-shoes-LLKMCX.png',
-    category: 'Shoes',
-    brand: 'Nike',
-    size: '11',
-    color: 'Black/White',
-    stock: 20,
-  },
-  {
-    name: 'Nike React Infinity Run',
-    description: 'A lightweight, responsive running shoe designed to help reduce injury and keep you on the run.',
-    price: '159.99',
-    imageUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/8439f823-86cf-4086-81d2-4f9ff9a66866/react-infinity-run-flyknit-3-mens-road-running-shoes-ZQGpHZ.png',
-    category: 'Running',
-    brand: 'Nike',
-    size: '10.5',
-    color: 'Blue/White',
-    stock: 15,
-  },
-  {
-    name: 'Nike Blazer Mid',
-    description: 'The Nike Blazer Mid brings a timeless design back to the streets while delivering the comfort you need.',
-    price: '89.99',
-    imageUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/05859dc8-6acc-4d9e-9b95-5d5c5c8b5c5c/blazer-mid-77-vintage-mens-shoes-nw30B2.png',
-    category: 'Lifestyle',
-    brand: 'Nike',
-    size: '9.5',
-    color: 'White/Black',
-    stock: 18,
-  },
-  {
-    name: 'Nike Air Jordan 1',
-    description: 'The Air Jordan 1 Retro High OG lets you fly in the original that started it all.',
-    price: '169.99',
-    imageUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/e6da41fa-1be4-4ce5-9be8-5d5c5c8b5c5c/air-jordan-1-retro-high-og-mens-shoes-Lg5NNr.png',
-    category: 'Basketball',
-    brand: 'Nike',
-    size: '10',
-    color: 'Chicago Red',
-    stock: 12,
-  },
-];
+function slugify(s: string) {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+}
+
+async function upsert<T extends { id: string }>(
+  table: any,
+  rows: Omit<T, 'id'> & Partial<T>[],
+  uniqueKey: keyof T
+) {
+  for (const row of rows as any[]) {
+    const key = row[uniqueKey as string];
+    if (!key) {
+      await db.insert(table).values(row);
+      continue;
+    }
+    const found = await db.select().from(table).where(eq((table as any)[uniqueKey as string], key as any)).limit(1);
+    if (found.length === 0) {
+      await db.insert(table).values(row);
+    }
+  }
+}
+
+async function ensureStaticUploads() {
+  const uploadsDir = path.join(process.cwd(), 'static', 'uploads');
+  if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+
+  const shoesSrc = path.join(process.cwd(), 'public', 'shoes');
+  const shoeFiles = fs.existsSync(shoesSrc) ? fs.readdirSync(shoesSrc).filter(f => /\.(png|jpg|jpeg|webp)$/i.test(f)) : [];
+
+  const copied: string[] = [];
+  for (const f of shoeFiles) {
+    const src = path.join(shoesSrc, f);
+    const dest = path.join(uploadsDir, f);
+    if (!fs.existsSync(dest)) {
+      fs.copyFileSync(src, dest);
+    }
+    copied.push(`/static/uploads/${f}`);
+  }
+  return copied;
+}
 
 async function seed() {
   try {
-    console.log('Seeding database...');
-    
-    await db.insert(products).values(nikeProducts);
-    
-    console.log('Database seeded successfully!');
+    console.log('Seeding filters/brands/categories/collections...');
+
+    const genderData = [
+      { id: crypto.randomUUID(), label: 'Men', slug: 'men' },
+      { id: crypto.randomUUID(), label: 'Women', slug: 'women' },
+      { id: crypto.randomUUID(), label: 'Kids', slug: 'kids' },
+    ];
+    await upsert(genders as any, genderData, 'slug' as any);
+
+    const colorData = [
+      { id: crypto.randomUUID(), name: 'Red', slug: 'red', hexCode: '#FF0000' },
+      { id: crypto.randomUUID(), name: 'Black', slug: 'black', hexCode: '#000000' },
+      { id: crypto.randomUUID(), name: 'White', slug: 'white', hexCode: '#FFFFFF' },
+      { id: crypto.randomUUID(), name: 'Blue', slug: 'blue', hexCode: '#1E3A8A' },
+      { id: crypto.randomUUID(), name: 'Green', slug: 'green', hexCode: '#10B981' },
+      { id: crypto.randomUUID(), name: 'Grey', slug: 'grey', hexCode: '#6B7280' },
+    ];
+    await upsert(colors as any, colorData, 'slug' as any);
+
+    const sizeData = [
+      { id: crypto.randomUUID(), name: '7', slug: '7', sortOrder: 1 },
+      { id: crypto.randomUUID(), name: '8', slug: '8', sortOrder: 2 },
+      { id: crypto.randomUUID(), name: '9', slug: '9', sortOrder: 3 },
+      { id: crypto.randomUUID(), name: '10', slug: '10', sortOrder: 4 },
+      { id: crypto.randomUUID(), name: '11', slug: '11', sortOrder: 5 },
+      { id: crypto.randomUUID(), name: '12', slug: '12', sortOrder: 6 },
+    ];
+    await upsert(sizes as any, sizeData, 'slug' as any);
+
+    const nikeBrand = { id: crypto.randomUUID(), name: 'Nike', slug: 'nike', logoUrl: undefined as unknown as string | undefined };
+    await upsert(brands as any, [nikeBrand], 'slug' as any);
+
+    const categoryNames = ['Running', 'Basketball', 'Lifestyle', 'Training', 'Soccer'];
+    const categoryData = categoryNames.map((n) => ({ id: crypto.randomUUID(), name: n, slug: slugify(n), parentId: null as any }));
+    await upsert(categories as any, categoryData, 'slug' as any);
+
+    const collectionNames = ["Summer '25", "Fall '25", "Essentials"];
+    const collectionsData = collectionNames.map((n) => ({ id: crypto.randomUUID(), name: n, slug: slugify(n), createdAt: new Date() }));
+    await upsert(collections as any, collectionsData, 'slug' as any);
+
+    console.log('Copying images if available...');
+    const copiedImages = await ensureStaticUploads();
+
+    console.log('Seeding 15 products with variants and images...');
+    const gendersAll = await db.select().from(genders);
+    const colorsAll = await db.select().from(colors);
+    const sizesAll = await db.select().from(sizes);
+    const catsAll = await db.select().from(categories);
+    const colsAll = await db.select().from(collections);
+
+    const productNames = [
+      'Air Max 90',
+      'Air Force 1',
+      'Dunk Low',
+      'React Infinity Run',
+      'Blazer Mid',
+      'Air Jordan 1',
+      'Pegasus Trail',
+      'Metcon 9',
+      'Mercurial Vapor',
+      'Phantom GX',
+      'Air Zoom Alphafly',
+      'Invincible Run',
+      'ZoomX Streakfly',
+      'SB Dunk High',
+      'Structure 25',
+    ];
+
+    for (let i = 0; i < 15; i++) {
+      const name = `Nike ${productNames[i]}`;
+      const gender = gendersAll[i % gendersAll.length];
+      const cat = catsAll[i % catsAll.length];
+      const brand = nikeBrand;
+      const pid = crypto.randomUUID();
+
+      await db.insert(products).values({
+        id: pid,
+        name,
+        description: `${name} by Nike, engineered for comfort and performance.`,
+        categoryId: cat.id,
+        genderId: gender.id,
+        brandId: brand.id,
+        isPublished: true,
+        defaultVariantId: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      const colorChoices = [colorsAll[i % colorsAll.length], colorsAll[(i + 2) % colorsAll.length]];
+      const sizeChoices = [sizesAll[1], sizesAll[2], sizesAll[3]];
+
+      let primaryVariantId: string | null = null;
+      let skuCounter = 1;
+
+      for (const col of colorChoices) {
+        for (const sz of sizeChoices) {
+          const vid = crypto.randomUUID();
+          const basePrice = 90 + (i % 5) * 10;
+          const price = (basePrice + (skuCounter % 3) * 5).toFixed(2);
+          const sale = skuCounter % 4 === 0 ? (basePrice - 10).toFixed(2) : null;
+
+          await db.insert(productVariants).values({
+            id: vid,
+            productId: pid,
+            sku: `${slugify(productNames[i])}-${col.slug}-${sz.slug}-${skuCounter}`,
+            price: price as unknown as any,
+            salePrice: sale as unknown as any,
+            colorId: col.id,
+            sizeId: sz.id,
+            inStock: 10 + ((i + skuCounter) % 10),
+            weight: 0.5 + ((skuCounter % 5) * 0.1),
+            dimensions: { length: 30, width: 10 + (skuCounter % 3), height: 12 },
+            createdAt: new Date(),
+          });
+
+          if (!primaryVariantId) primaryVariantId = vid;
+
+          const imgSet = copiedImages.length
+            ? copiedImages.slice(0, Math.min(3, copiedImages.length))
+            : [
+                `https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/${i}a-${skuCounter}-1.png`,
+                `https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/${i}a-${skuCounter}-2.png`,
+              ];
+
+          let sort = 0;
+          for (const url of imgSet) {
+            await db.insert(productImages).values({
+              id: crypto.randomUUID(),
+              productId: pid,
+              variantId: vid,
+              url,
+              sortOrder: sort++,
+              isPrimary: sort === 1,
+            });
+          }
+          skuCounter++;
+        }
+      }
+
+      if (primaryVariantId) {
+        await db.update(products).set({ defaultVariantId: primaryVariantId, updatedAt: new Date() }).where(eq(products.id, pid));
+      }
+
+      const assignedCollection = colsAll[i % colsAll.length];
+      await db.insert(productCollections).values({
+        id: crypto.randomUUID(),
+        productId: pid,
+        collectionId: assignedCollection.id,
+      });
+
+      console.log(`Seeded product: ${name}`);
+    }
+
+    console.log('Seeding complete.');
   } catch (error) {
     console.error('Error seeding database:', error);
+    process.exitCode = 1;
   }
 }
 
