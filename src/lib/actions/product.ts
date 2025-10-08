@@ -22,6 +22,7 @@ import {
   lte,
   sql,
 } from 'drizzle-orm';
+import type { SQL } from 'drizzle-orm';
 
 export type ProductListParams = {
   search?: string;
@@ -78,7 +79,7 @@ export async function getAllProducts(params: ProductListParams): Promise<GetAllP
   const colorSlugs = params.color && params.color.length ? params.color : undefined;
   const sizeSlugs = params.size && params.size.length ? params.size : undefined;
 
-  const baseFilters = [
+  const baseFilters: (SQL | undefined)[] = [
     eq(products.isPublished, true),
     params.search ? ilike(products.name, `%${params.search}%`) : undefined,
     brandSlugs
@@ -108,9 +109,9 @@ export async function getAllProducts(params: ProductListParams): Promise<GetAllP
             .where(inArray(genders.slug, genderSlugs)),
         )
       : undefined,
-  ].filter(Boolean) as any[];
+  ].filter(Boolean) as SQL[];
 
-  const variantFilters = [
+  const variantFilters: (SQL | undefined)[] = [
     colorSlugs
       ? inArray(
           productVariants.colorId,
@@ -129,12 +130,11 @@ export async function getAllProducts(params: ProductListParams): Promise<GetAllP
             .where(inArray(sizes.slug, sizeSlugs)),
         )
       : undefined,
-    params.priceMin !== undefined ? gte(productVariants.price, params.priceMin) : undefined,
-    params.priceMax !== undefined ? lte(productVariants.price, params.priceMax) : undefined,
-  ].filter(Boolean) as any[];
+    params.priceMin !== undefined ? gte(productVariants.price, String(params.priceMin)) : undefined,
+    params.priceMax !== undefined ? lte(productVariants.price, String(params.priceMax)) : undefined,
+  ].filter(Boolean) as SQL[];
 
-  const whereExpr =
-    variantFilters.length > 0 ? and(...baseFilters, and(...variantFilters)) : and(...baseFilters);
+  const whereExpr = and(...[...baseFilters, ...(variantFilters as SQL[])].filter(Boolean) as SQL[]);
 
   const [{ total }] = await db
     .select({
@@ -206,17 +206,17 @@ export type ProductDetail = {
   id: string;
   name: string;
   description: string | null;
-  brand: { id: string; name: string; slug: string | null };
-  category: { id: string; name: string; slug: string | null };
-  gender: { id: string; label: string; slug: string | null };
+  brand: { id: string | null; name: string | null; slug: string | null };
+  category: { id: string | null; name: string | null; slug: string | null };
+  gender: { id: string | null; label: string | null; slug: string | null };
   variants: Array<{
     id: string;
     sku: string;
     price: number;
     salePrice: number | null;
     inStock: number;
-    size: { id: string; name: string; slug: string | null };
-    color: { id: string; name: string; slug: string | null; hexCode: string };
+    size: { id: string | null; name: string | null; slug: string | null };
+    color: { id: string | null; name: string | null; slug: string | null; hexCode: string | null };
     images: string[];
   }>;
   images: string[];

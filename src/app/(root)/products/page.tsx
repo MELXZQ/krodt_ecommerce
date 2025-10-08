@@ -9,17 +9,16 @@ type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
 export default async function ProductsPage(props: { searchParams: SearchParams }) {
   const raw = await props.searchParams;
-  const urlParams = new URLSearchParams(
-    Object.entries(raw).flatMap(([k, v]) =>
-      Array.isArray(v) ? v.map((vv) => [k, vv]) : v ? [[k, v as string]] : []
-    ) as any
-  );
+  const entries: [string, string][] = Object.entries(raw).flatMap(([k, v]) =>
+    Array.isArray(v) ? v.map((vv) => [k, String(vv)]) : v ? [[k, String(v)]] : []
+  ) as [string, string][];
+  const urlParams = new URLSearchParams(entries);
   const filters = parseFilterParams(urlParams);
-  const { products, totalCount } = await getAllProducts(filters);
+  const { products } = await getAllProducts(filters);
 
   const activeBadges: { key: string; value: string }[] = [];
-  ["gender", "size", "color", "brand", "category"].forEach((k) => {
-    const vals = (filters as any)[k] as string[] | undefined;
+  (["gender", "size", "color", "brand", "category"] as const).forEach((k) => {
+    const vals = (filters as Record<string, unknown>)[k] as string[] | undefined;
     vals?.forEach((v) => activeBadges.push({ key: k, value: v }));
   });
 
