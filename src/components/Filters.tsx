@@ -7,6 +7,7 @@ import {
   stringifyQuery,
   toggleListParam,
   resetPagination,
+  normalizeToArray,
 } from "@/lib/utils/query";
 
 type Group = {
@@ -79,7 +80,7 @@ export default function Filters() {
 
   const isChecked = useCallback(
     (key: string, value: string) => {
-      const list = (Array.isArray(parsed[key]) ? parsed[key] : (parsed[key] ? String(parsed[key]).split(',') : [])) as string[];
+      const list = normalizeToArray(parsed[key]);
       return list.includes(value);
     },
     [parsed]
