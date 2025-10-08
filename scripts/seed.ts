@@ -25,7 +25,7 @@ async function ensureStaticUploads() {
   if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
   const shoesSrc = path.join(process.cwd(), 'public', 'shoes');
-  const shoeFiles = fs.existsSync(shoesSrc) ? fs.readdirSync(shoesSrc).filter(f => /\.(png|jpg|jpeg|webp)$/i.test(f)) : [];
+  const shoeFiles = fs.existsSync(shoesSrc) ? fs.readdirSync(shoesSrc).filter(f => /\.(png|jpg|jpeg|webp|avif)$/i.test(f)) : [];
 
   const copied: string[] = [];
   for (const f of shoeFiles) {
@@ -101,6 +101,12 @@ async function seed() {
     const catsAll = await db.select().from(categories);
     const colsAll = await db.select().from(collections);
 
+    await db.delete(productImages);
+    await db.delete(productVariants);
+    await db.delete(productCollections);
+    await db.delete(products);
+
+
     const productNames = [
       'Air Max 90',
       'Air Force 1',
@@ -168,12 +174,12 @@ async function seed() {
 
           if (!primaryVariantId) primaryVariantId = vid;
 
-          const imgSet = copiedImages.length
-            ? copiedImages.slice(0, Math.min(3, copiedImages.length))
-            : [
-                `https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/${i}a-${skuCounter}-1.png`,
-                `https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/${i}a-${skuCounter}-2.png`,
-              ];
+          if (copiedImages.length < 15) {
+            throw new Error(`Seeding requires at least 15 local images in /public/shoes; found ${copiedImages.length}.`);
+          }
+          const uniqueImageForProduct = copiedImages[i];
+
+          const imgSet = [uniqueImageForProduct];
 
           let sort = 0;
           for (const url of imgSet) {
