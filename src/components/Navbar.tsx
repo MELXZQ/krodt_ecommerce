@@ -23,7 +23,7 @@ export default function Navbar() {
   return (
     <header className="w-full border-b border-[var(--color-light-300)] bg-[var(--color-light-100)]">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6">
-        <Link href="#" aria-label="Home" className="flex items-center gap-2">
+        <Link href="/" aria-label="Home" className="flex items-center gap-2">
           <Image
             src="/logo.svg"
             alt="Logo"

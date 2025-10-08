@@ -24,7 +24,7 @@ const MOCK_PRODUCTS: Product[] = [
     price: 98.3,
     createdAt: new Date("2025-09-01"),
     tags: { gender: "men", color: "black", size: "10" },
-    imageUrl: "/shoes/air-max-90.jpg",
+    imageUrl: "/shoes/shoe-1.jpg",
   },
   {
     id: "2",
@@ -33,7 +33,7 @@ const MOCK_PRODUCTS: Product[] = [
     price: 98.3,
     createdAt: new Date("2025-08-22"),
     tags: { gender: "women", color: "white", size: "8" },
-    imageUrl: "/shoes/air-force-1.jpg",
+    imageUrl: "/shoes/shoe-2.webp",
   },
   {
     id: "3",
@@ -42,7 +42,7 @@ const MOCK_PRODUCTS: Product[] = [
     price: 120,
     createdAt: new Date("2025-07-10"),
     tags: { gender: "men", color: "green", size: "11" },
-    imageUrl: "/shoes/dunk-low.jpg",
+    imageUrl: "/shoes/shoe-3.webp",
   },
   {
     id: "4",
@@ -51,7 +51,7 @@ const MOCK_PRODUCTS: Product[] = [
     price: 75,
     createdAt: new Date("2025-06-15"),
     tags: { gender: "women", color: "blue", size: "9" },
-    imageUrl: "/shoes/legend-essential-3.jpg",
+    imageUrl: "/shoes/shoe-4.webp",
   },
   {
     id: "5",
@@ -60,7 +60,7 @@ const MOCK_PRODUCTS: Product[] = [
     price: 95,
     createdAt: new Date("2025-05-30"),
     tags: { gender: "women", color: "white", size: "7" },
-    imageUrl: "/shoes/blazer-low-77.jpg",
+    imageUrl: "/shoes/shoe-5.avif",
   },
   {
     id: "6",
@@ -69,7 +69,7 @@ const MOCK_PRODUCTS: Product[] = [
     price: 80,
     createdAt: new Date("2025-03-18"),
     tags: { gender: "men", color: "black", size: "9" },
-    imageUrl: "/shoes/court-vision-low.jpg",
+    imageUrl: "/shoes/shoe-6.avif",
   },
 ];
 
