@@ -6,7 +6,14 @@ export type QueryObject = Record<string, unknown>;
 
 export function parseQuery(input: string): QueryObject {
   const str = input.startsWith('?') ? input : `?${input}`;
-  return qs.parse(str, { arrayFormat: 'comma', parseBooleans: true, parseNumbers: false }) as QueryObject;
+  const parsed = qs.parse(str, { parseBooleans: true, parseNumbers: false }) as QueryObject;
+  for (const k in parsed) {
+    const v = parsed[k];
+    if (typeof v === 'string' && v.includes(',')) {
+      parsed[k] = v.split(',').filter(Boolean);
+    }
+  }
+  return parsed;
 }
 
 export function stringifyQuery(params: QueryObject): string {
@@ -49,7 +56,7 @@ export function resetPagination(params: QueryObject): QueryObject {
   return updated;
 }
 
-function normalizeToArray(v: unknown): string[] {
+export function normalizeToArray(v: unknown): string[] {
   if (v === undefined || v === null || v === '') return [];
   if (Array.isArray(v)) return v.map(String);
   return String(v).split(',').filter(Boolean);

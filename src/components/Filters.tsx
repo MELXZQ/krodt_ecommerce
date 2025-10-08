@@ -79,8 +79,7 @@ export default function Filters() {
 
   const isChecked = useCallback(
     (key: string, value: string) => {
-      const arr = (parsed[key] ?? []) as string[] | string;
-      const list = Array.isArray(arr) ? arr : [arr].filter(Boolean);
+      const list = (Array.isArray(parsed[key]) ? parsed[key] : (parsed[key] ? String(parsed[key]).split(',') : [])) as string[];
       return list.includes(value);
     },
     [parsed]
