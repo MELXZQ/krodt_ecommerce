@@ -25,7 +25,10 @@ async function ensureStaticUploads() {
   if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
   const shoesSrc = path.join(process.cwd(), 'public', 'shoes');
-  const shoeFiles = fs.existsSync(shoesSrc) ? fs.readdirSync(shoesSrc).filter(f => /\.(png|jpg|jpeg|webp|avif)$/i.test(f)) : [];
+  const exts = /\.(png|jpg|jpeg|webp|avif)$/i;
+  const shoeFiles = fs.existsSync(shoesSrc)
+    ? fs.readdirSync(shoesSrc).filter(f => exts.test(f)).sort((a, b) => a.localeCompare(b))
+    : [];
 
   const copied: string[] = [];
   for (const f of shoeFiles) {
@@ -94,13 +97,17 @@ async function seed() {
     console.log('Copying images if available...');
     const copiedImages = await ensureStaticUploads();
 
+    if (copiedImages.length < 15) {
+      throw new Error(`Seeding requires at least 15 local images in /public/shoes; found ${copiedImages.length}.`);
+    }
+    const selectedImages = copiedImages.slice(0, 15);
+
     console.log('Seeding 15 products with variants and images...');
     const gendersAll = await db.select().from(genders);
     const colorsAll = await db.select().from(colors);
     const sizesAll = await db.select().from(sizes);
     const catsAll = await db.select().from(categories);
     const colsAll = await db.select().from(collections);
-
     await db.delete(productImages);
     await db.delete(productVariants);
     await db.delete(productCollections);
@@ -174,22 +181,25 @@ async function seed() {
 
           if (!primaryVariantId) primaryVariantId = vid;
 
-          if (copiedImages.length < 15) {
-            throw new Error(`Seeding requires at least 15 local images in /public/shoes; found ${copiedImages.length}.`);
-          }
-          const uniqueImageForProduct = copiedImages[i];
+          if (primaryVariantId === vid) {
+            const uniqueProductImage = selectedImages[i];
 
-          const imgSet = [uniqueImageForProduct];
+            await db.insert(productImages).values({
+              id: crypto.randomUUID(),
+              productId: pid,
+              variantId: null,
+              url: uniqueProductImage,
+              sortOrder: 0,
+              isPrimary: true,
+            });
 
-          let sort = 0;
-          for (const url of imgSet) {
             await db.insert(productImages).values({
               id: crypto.randomUUID(),
               productId: pid,
               variantId: vid,
-              url,
-              sortOrder: sort++,
-              isPrimary: sort === 1,
+              url: uniqueProductImage,
+              sortOrder: 0,
+              isPrimary: true,
             });
           }
           skuCounter++;
